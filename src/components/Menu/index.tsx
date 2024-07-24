@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useMyContext } from '../../context/Context';
 import * as I from "../../Interfaces/Interface";
 import * as C from "./styles";
@@ -10,7 +10,6 @@ import { PiSealWarningFill } from "react-icons/pi";
 
 const Menu: React.FC = () => {
   const { dispatch } = useMyContext();
-  // const weatherRef = useRef<HTMLDivElement>(null)
   const getTempo = async () => {
     // console.log('entrei');
     try {
