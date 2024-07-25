@@ -1,48 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useMyContext } from "../../context/Context";
 import * as I from "../../Interfaces/Interface";
 import * as C from "./styles";
-import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import AdvertenciasComponents from "../../components/AdvertenciasComponents";
 import HeaderComponent from "../../components/HeaderComponent";
 import Input from "../../components/Input";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // import { Container } from './styles';
 
 const Advertencias: React.FC = () => {
-  const { textWrapFill, state, dispatch } = useMyContext();
-  const getAlunosAdvertidos = async () => {
-    try {
-      const response = await fetch(
-        "https://main--incidents-api.netlify.app/.netlify/functions/alunosAdvertidos",
-        {
-          mode: "cors", // Adiciona o modo CORS explicitamente
-          headers: {
-            // 'Authorization': 'Bearer seu_token_aqui', // Exemplo se precisar de autenticação
-            "Content-Type": "application/json", // Se sua API esperar JSON
-          },
-        }
-      );
-      const data = await response.json();
-      dispatch({ type: I.ContextActions.setAlunosAdvertidos, payload: data });
-      return data;
-    } catch (err: any) {
-      toast.error(err);
-      throw err;
-    }
-  };
-
-  const { data, isLoading } = useQuery({
+  const { textWrapFill, state, dispatch, getAlunosAdvertidos } = useMyContext();
+  const [open, setOpen] = React.useState(true);
+  
+  
+  const { isLoading } = useQuery({
     queryKey: ["alunosAdvertidos"],
     queryFn: getAlunosAdvertidos,
   });
+  useEffect(() => {
+    if (!isLoading) {
+      setOpen(false);
+    }
+  }, [isLoading]);
 
   if (isLoading) {
-    return <div>Carregando...</div>;
+    return (
+      <div>
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      </div>
+    );
   }
 
-  const dado = state.filtro ? state.filtro : data;
+  const dado = state.filtro ? state.filtro : state.data;
 
   const advertenciasFiltradas: string[] = state.alunosAdvertidos
     .filter((advertencia) => dado === "" || advertencia.includes(dado))

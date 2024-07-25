@@ -7,6 +7,7 @@ interface State {
   password: string;
   userName: string;
   tempo: any;
+  open: boolean;
 }
 
 interface Action {
@@ -23,6 +24,7 @@ export enum ContextActions {
   setPassword,
   setUserName,
   setTempo,
+  setOpen,
 }
 
 interface ContextType {
@@ -38,6 +40,11 @@ interface ContextType {
   setLoadingUser: (loadingUser: boolean) => void;
   signOut: () => void;
   textWrapFill: (text: string, width: number) => string;
+  getTempo: () => void;
+  getAlunosAdvertidos: () => void;
+  getOcorrencias: () => void;
+  data: any;
+
 }
 
 interface ContextProviderProps {

@@ -8,10 +8,8 @@ const OcorrenciasComponents: React.FC<IOcorrenciasComponentProps> = ({
   data,
 }) => {
   const dado = name ? name : data;
-  console.log(dado);
   
   const shouldDisplayMessage = (dado !== '' ?? message.includes(dado));
-  console.log(shouldDisplayMessage);
   return (
     <C.Container>
       { shouldDisplayMessage && dado }

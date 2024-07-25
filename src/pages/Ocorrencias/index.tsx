@@ -1,53 +1,53 @@
 /* eslint-disable array-callback-return */
-import React from "react";
+import React, { useEffect } from "react";
 import { useMyContext } from "../../context/Context";
 import * as I from "../../Interfaces/Interface";
 import * as C from "./styles";
 import OcorrenciasComponents from "../../components/OcorrenciasComponents";
-import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import HeaderComponent from "../../components/HeaderComponent";
 import Input from "../../components/Input";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Ocorrencias: React.FC = () => {
-  const { textWrapFill, state, dispatch } = useMyContext();
-  const getOcorrencias = async () => {
-    console.log("entrei");
-    try {
-      console.log("try");
-      const response = await fetch(
-        "https://main--incidents-api.netlify.app/.netlify/functions/ocorrencias",
-        {
-          mode: "cors", // Adiciona o modo CORS explicitamente
-          headers: {
-            // 'Authorization': 'Bearer seu_token_aqui', // Exemplo se precisar de autenticação
-            "Content-Type": "application/json", // Se sua API esperar JSON
-          },
-        }
-      );
-      console.log(response);
-      const data = await response.json();
-      // console.log('data ',data);
-      dispatch({ type: I.ContextActions.setOcorrencias, payload: data });
-      // console.log('data ',state.ocorrencias);
-      return data;
-    } catch (err: any) {
-      toast.error(err);
-      throw err;
-    }
-  };
+  const { textWrapFill, state, dispatch, getOcorrencias } = useMyContext();
+  const [open, setOpen] = React.useState(true);
+
   const { data, isLoading } = useQuery({
     queryKey: ["ocorrencias"],
     queryFn: getOcorrencias,
   });
 
-  const dado = state.filtro ? state.filtro : state.data;
-  console.log("dado: ", dado);
+  useEffect(() => {
+    if (!isLoading) {
+      setOpen(false);
+    }
+  }, [isLoading]);
 
-  const ocorrenciasFiltradas = data?.filter((item: string[]) => {
-    dado === "" || item.includes(dado);
-  });
-  console.log(" OCORRENCIAS FILTRADAS ", ocorrenciasFiltradas);
+  if (isLoading) {
+    return (
+      <div>
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={open}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      </div>
+    );
+  }
+
+  const dado = state.filtro ? state.filtro : state.data;
+  // console.log("dado: ", dado);
+
+  const entradas = Array.isArray(data)
+    ? data.filter((item: string[]) => {
+        return dado === "" || item.includes(dado);
+      })
+    : [];
+
+  // console.log(" OCORRENCIAS FILTRADAS ", entradas);
 
   return (
     <C.Container>
@@ -78,8 +78,8 @@ const Ocorrencias: React.FC = () => {
           <div>Carregando...</div>
         ) : (
           <div>
-            {ocorrenciasFiltradas.length > 0
-              ? ocorrenciasFiltradas?.map((item: string, index: any) => (
+            {entradas.length > 0
+              ? entradas?.map((item: string, index: any) => (
                   <OcorrenciasComponents
                     key={index}
                     message={item}
@@ -87,7 +87,8 @@ const Ocorrencias: React.FC = () => {
                     data={state.data}
                   />
                 ))
-              : data?.map((item: string, index: any) => {
+              : Array.isArray(data) &&
+                data.map((item: string, index: any) => {
                   return (
                     <OcorrenciasComponents
                       key={index}
