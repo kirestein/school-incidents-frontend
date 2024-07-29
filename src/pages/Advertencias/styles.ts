@@ -10,7 +10,5 @@ export const Container = styled.div`
 
 export const Content = styled.div`
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     padding: 0 10px;
 `;

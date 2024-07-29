@@ -11,8 +11,8 @@ import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 
 const initialData: I.State = {
-  alunosAdvertidos: [],
-  ocorrencias: [],
+  alunosAdvertidos: {},
+  ocorrencias: {},
   filtro: "",
   data: "",
   email: "",
@@ -60,23 +60,26 @@ const ContextProvider: React.FC<I.ContextProviderProps> = ({ children }) => {
     // console.log('entrei');
     try {
       // console.log('try');
-      const response = await fetch('https://main--incidents-api.netlify.app/.netlify/functions/tempo', {
-        mode: 'cors', // Adiciona o modo CORS explicitamente
-        headers: {
-          // 'Authorization': 'Bearer seu_token_aqui', // Exemplo se precisar de autenticação
-          'Content-Type': 'application/json', // Se sua API esperar JSON
-        },
-      });
+      const response = await fetch(
+        "https://main--incidents-api.netlify.app/.netlify/functions/tempo",
+        {
+          mode: "cors", // Adiciona o modo CORS explicitamente
+          headers: {
+            // 'Authorization': 'Bearer seu_token_aqui', // Exemplo se precisar de autenticação
+            "Content-Type": "application/json", // Se sua API esperar JSON
+          },
+        }
+      );
       // console.log(response);
       const data = await response.json();
       // console.log('data ',data);
-      dispatch({ type: I.ContextActions.setTempo, payload: data})
-      // console.log('data ',state.ocorrencias);  
+      dispatch({ type: I.ContextActions.setTempo, payload: data });
+      // console.log('data ',state.ocorrencias);
       return data;
-    } catch(err:any) {
+    } catch (err: any) {
       toast.error(err);
       throw err;
-    };
+    }
   };
 
   const { data } = useQuery({
@@ -84,25 +87,45 @@ const ContextProvider: React.FC<I.ContextProviderProps> = ({ children }) => {
     queryFn: getTempo,
   });
 
-
   // if (isLoading) {
   //   return <div>Carregando...</div>
   // }
 
-  
   const signIn = async (email: string, password: string) => {
+    // console.log("logando 1");
+
     setLoadingUser(false);
     await signInWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        const uid = user.uid;
+      .then(async (value) => {
+        const uid = value.user.uid;
         const userRef = doc(db, "users", uid);
         const userDoc = await getDoc(userRef);
+        let data: any = {};
+        const promise = new Promise((r) => setTimeout(r, 2000));
         if (userDoc.exists()) {
-          const data = userDoc.data();
+          data = {
+            uid: uid,
+            nome: userDoc.data()?.name,
+            email: value.user.email,
+            avatarUrl: userDoc.data()?.avatarUrl,
+          };
           setUser(data);
+          toast.promise(promise, {
+            pending: "Carregando",
+            success: "Bem vindo(a): " + data.nome,
+            error: "Erro ao tentar logar",
+          });
         }
+        dispatch({
+          type: I.ContextActions.setPassword,
+          payload: "",
+        });
+        dispatch({
+          type: I.ContextActions.setEmail,
+          payload: "",
+        });
         setLoadingUser(true);
+        return user
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -143,6 +166,18 @@ const ContextProvider: React.FC<I.ContextProviderProps> = ({ children }) => {
           name,
         });
         setLoading(false);
+        dispatch({
+          type: I.ContextActions.setUserName,
+          payload: "",
+        });
+        dispatch({
+          type: I.ContextActions.setEmail,
+          payload: "",
+        });
+        dispatch({
+          type: I.ContextActions.setPassword,
+          payload: "",
+        });
         toast.success("Usuário cadastrado com sucesso");
       })
       .catch((error) => {
@@ -184,8 +219,6 @@ const ContextProvider: React.FC<I.ContextProviderProps> = ({ children }) => {
     return lines.join("\n");
   };
 
-  
-
   const getAlunosAdvertidos = async () => {
     try {
       const response = await fetch(
@@ -221,10 +254,9 @@ const ContextProvider: React.FC<I.ContextProviderProps> = ({ children }) => {
           },
         }
       );
+
       const data = await response.json();
-      // console.log('data ',data);
       dispatch({ type: I.ContextActions.setOcorrencias, payload: data });
-      // console.log('data ',state.ocorrencias);
       return data;
     } catch (err: any) {
       toast.error(err);

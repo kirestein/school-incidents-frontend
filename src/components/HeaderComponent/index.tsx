@@ -23,20 +23,41 @@ import HomeIcon from "@mui/icons-material/Home";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ThermostatIcon from '@mui/icons-material/Thermostat';
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const HeaderComponent: React.FC<IContentHeaderProps> = ({
   title,
   linecolor,
-  children,
-  children2,
 }) => {
-  const { state, dispatch } = useMyContext();
+  const { state, dispatch, signOut } = useMyContext();
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const drawerWidth = 240;
 
-  
+  const logout = () => {
+    signOut();
+    toast.success("Deslogado com sucesso!");
+    navigate("/");
+  }
+
+  const getLinkPath = (text:string) => {
+    switch (text) {
+      case "Home":
+        return "/home";
+      case "Ocorrências":
+        return "/ocorrencias";
+      case "Alunos Advertidos":
+        return "/alunos-advertidos";
+      case "Register":
+        return "/register";
+      default:
+        return "/";
+    }
+  };
+
 
   const DrawerHeader = styled("div")(({ theme }) => ({
     display: "flex",
@@ -55,21 +76,6 @@ const HeaderComponent: React.FC<IContentHeaderProps> = ({
       type: I.ContextActions.setOpen,
       payload: false,
     });
-  };
-
-  const handleRedirect = (e: any, text: string) => {
-    e.preventDefault();
-    if (text === "Home") {
-      window.location.href = "/home";
-    } else if (text === "Ocorrências") {
-      window.location.href = "/ocorrencias";
-    } else if (text === "Alunos Advertidos") {
-      window.location.href = "/alunos-advertidos";
-    } else if (text === "Register") {
-      window.location.href = "/register";
-    } else if (text === "Log Out") {
-      console.log("usuário deslogado");
-    }
   };
 
   const DrawerPersistent = (
@@ -111,14 +117,23 @@ const HeaderComponent: React.FC<IContentHeaderProps> = ({
           <List>
             {["Home", "Ocorrências", "Alunos Advertidos"].map((text, index) => (
               <ListItem key={text} disablePadding>
-                <ListItemButton onClick={(e) => handleRedirect(e, text)}>
-                  <ListItemIcon>
-                    {index === 0 && <HomeIcon />}
-                    {index === 1 && <NoteAltIcon />}
-                    {index === 2 && <ReportIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
+                <Link onClick={
+                  () => {
+                    dispatch({
+                      type: I.ContextActions.setOpen,
+                      payload: false,
+                    });
+                  }
+                } to={getLinkPath(text)} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      {index === 0 && <HomeIcon />}
+                      {index === 1 && <NoteAltIcon />}
+                      {index === 2 && <ReportIcon />}
+                    </ListItemIcon>
+                    <ListItemText primary={text} />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             ))}
           </List>
@@ -126,13 +141,32 @@ const HeaderComponent: React.FC<IContentHeaderProps> = ({
           <List>
             {["Register", "Log Out"].map((text, index) => (
               <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index === 0 && <PersonAddIcon />}
-                    {index === 1 && <LogoutIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
+                {
+                  index === 0 ? (
+                    <Link onClick={
+                      () => {
+                        dispatch({
+                          type: I.ContextActions.setOpen,
+                          payload: false,
+                        });
+                      }
+                    } to={getLinkPath(text)} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <ListItemButton>
+                        <ListItemIcon>
+                          <PersonAddIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={text} />
+                      </ListItemButton>
+                    </Link>
+                  ) : (
+                    <ListItemButton onClick={logout}>
+                      <ListItemIcon>
+                        <LogoutIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItemButton>
+                  )
+                }
               </ListItem>
             ))}
           </List>
@@ -168,8 +202,6 @@ const HeaderComponent: React.FC<IContentHeaderProps> = ({
         </Toolbar>
         {DrawerPersistent}
       </C.LeftContainer>
-      {children2}
-      <C.Controllers>{children}</C.Controllers>
     </C.Container>
   );
 };

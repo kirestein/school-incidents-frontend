@@ -7,12 +7,12 @@ export const InputContainer = styled.input`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 3rem;
-    width: 20rem;
-    padding: 0 0.5rem;
+    min-width: 25rem;
+    padding: 1rem;
     border-radius: 0.5rem;
     color: ${props => props.theme.colors.black};
     border: 1px solid ${props => props.theme.colors.gray};
     background-color: ${props => props.theme.colors.white};
-    
+    margin: 1rem 0;
+    font-size: 1.2rem;
 `

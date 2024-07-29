@@ -1,6 +1,16 @@
 interface State {
-  alunosAdvertidos: string[];
-  ocorrencias: string[];
+  alunosAdvertidos: {
+    [key: string]: {
+      columns: object[];
+      rows: object[];
+    };
+  };
+  ocorrencias: {
+    [key: string]: {
+      columns: object[];
+      rows: object[];
+    };
+  };
   filtro: string;
   data: string;
   email: string;
@@ -44,7 +54,6 @@ interface ContextType {
   getAlunosAdvertidos: () => void;
   getOcorrencias: () => void;
   data: any;
-
 }
 
 interface ContextProviderProps {
@@ -55,28 +64,36 @@ interface IChildrenProps {
   children: React.ReactNode;
 }
 
-interface IOcorrenciasComponentProps {
-  message: string;
-  name: string;
-  data: string;
-}
-
-interface IAdvertenciasComponentProps {
-  message: string;
-  name: string;
-}
-
 interface IContentHeaderProps {
-    title: string;
-    linecolor: string;
-    children: React.ReactNode;
-    children2?: React.ReactNode;
+  title: string;
+  linecolor: string;
+  children?: React.ReactNode;
+  children2?: React.ReactNode;
 }
 
 interface IInputProps {
-    name: string;
-    setName: (name: string) => void;
-    type?: string
+  type?: string;
+  value: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  required?: boolean;
+  accept?: string;
+}
+
+interface Ocorrencia {
+  id: number;
+  data: string;
+  email: string;
+  aluno: string;
+  turma: string;
+  motivo: string;
+  advertido: string;
+  professor: string;
+}
+
+interface OcorrenciasData {
+  columns: Array<{ field: string; headerName: string; type: string; width: number }>;
+  rows: Ocorrencia[];
 }
 
 export type {
@@ -85,8 +102,8 @@ export type {
   ContextProviderProps,
   State,
   IChildrenProps,
-  IOcorrenciasComponentProps,
-  IAdvertenciasComponentProps,
   IContentHeaderProps,
   IInputProps,
+  OcorrenciasData,
+  Ocorrencia,
 };

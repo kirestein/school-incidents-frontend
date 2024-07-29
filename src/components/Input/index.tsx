@@ -5,22 +5,23 @@ import { IInputProps } from '../../Interfaces/Interface';
 
 
 const Input: React.FC<IInputProps> = ({
-    name,
-    setName,
-    type = 'text'
+    type = 'text',
+    value,
+    onChange,
+    placeholder,
+    required,
+    accept,
 }) => {
-
-    const handleChange: React.ChangeEventHandler<HTMLInputElement> = ((e) => {
-        // No longer need to cast to any - hooray for react!
-        setName(e.target.value);
-    })
   return (
     <C.Container>
         <C.InputContainer 
-            type={type} 
-            placeholder='Pesquisar por aluno' 
-            onChange={ handleChange }
-            value={ name }
+            type={ type } 
+            placeholder={ placeholder } 
+            onChange={ onChange }
+            value={ value }
+            required={ required }
+            accept={ accept }
+
         />
     </C.Container>
   );

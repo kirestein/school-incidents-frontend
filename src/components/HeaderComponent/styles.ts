@@ -40,21 +40,29 @@ export const Controllers = styled.div`
   gap: 1rem;
 `;
 
-export const ColorIconButton = styled(IconButton)<IconButtonProps>(
-  ({ theme }) => ({
-    color: theme.colors.white,
-    "&:hover": {
-      color: theme.colors.secondary,
-    },
-  })
-);
+export const ColorIconButton = styled(IconButton)<IconButtonProps>`
+  color: ${props=>props.theme.colors.white};
+  &:hover {
+    color: ${props=>props.theme.colors.secondary};
+  };
+`;
 
-export const DrawerContainer = styled("div")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  backgroundColor: theme.colors.secondary,
-}));
+export const DrawerContainer = styled("div")`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: ${props=>props.theme.colors.white};
+  background-color: ${props=>props.theme.colors.purple900};
+  border: none;
+  & .css-i4bv87-MuiSvgIcon-root{
+    color: ${props=>props.theme.colors.white};
+  }
+  & .MuiDivider-root, 
+  .MuiDivider-fullWidth, 
+  .css-9mgopn-MuiDivider-root{
+    background-color: ${props=>props.theme.colors.white};
+  }
+`;
 
 export const TempoContainer = styled.div`
   display: flex;
